@@ -5,14 +5,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mental Health Chatbot</title>
     <link rel="stylesheet" href="/static/css/css/style.css">
+    <style>
+        /* Basic styles for the chat interface */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            width: 600px; /* Increased width for a larger interface */
+            margin: 40px auto; /* Center the container with more space */
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Ensures the border-radius works */
+        }
+        #chat-history {
+            height: 500px; /* Set height for chat history */
+            overflow-y: auto; /* Allow scrolling */
+            padding: 15px;
+            border-bottom: 1px solid #ddd; /* A subtle divider */
+        }
+        .chat-message {
+            display: flex;
+            align-items: flex-start; /* Align items at the top */
+            margin: 15px 0; /* Increased margin between messages */
+        }
+        .chat-message img {
+            width: 50px; /* Size of the bot logo */
+            height: 50px; /* Size of the bot logo */
+            border-radius: 50%; /* Makes the image circular */
+            margin-right: 15px; /* Space between logo and text */
+        }
+        .bot-message {
+            justify-content: flex-start; /* Aligns bot messages to the left */
+        }
+        .user-message {
+            justify-content: flex-end; /* Aligns user messages to the right */
+        }
+        .bot-message span, .user-message span {
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 75%; /* Limit the width */
+            word-wrap: break-word; /* Allow word wrapping */
+            white-space: pre-wrap; /* Ensure white spaces and line breaks are preserved */
+            border: 1px solid #ddd; /* Add border for visibility */
+            background-color: white; /* Keep the background white */
+        }
+        .bot-message span {
+            background-color: #f1f1f1; /* Light gray for bot replies */
+        }
+        .user-message span {
+            background-color: #007BFF; /* Blue background for user */
+            color: white; /* White text for user message */
+        }
+        .user-circle {
+            width: 50px; /* Size of the user circle */
+            height: 50px; /* Size of the user circle */
+            background-color: #007BFF; /* Blue variant for user */
+            border-radius: 50%; /* Makes the circle */
+            margin-left: 10px; /* Space between message and circle */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .chat-input {
+            width: calc(100% - 100px); /* Adjust width to make room for button */
+            padding: 15px;
+            border: none;
+            border-top: 1px solid #ddd; /* Divider above input */
+            outline: none; /* Remove outline on focus */
+        }
+        .submit-btn {
+            width: 100px; /* Wider button */
+            padding: 15px;
+            border: none;
+            background-color: #007BFF; /* Button color */
+            color: white; /* Button text color */
+            cursor: pointer;
+            border-top: 1px solid #ddd; /* Divider above button */
+        }
+        .submit-btn:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+    </style>
 </head>
 <body>
     <div class="chat-container">
-        <div id="chat-history"></div>
+        <div id="chat-history">
+            <div class="chat-message bot-message">
+                <img src="/static/css/original.jpeg" alt="Bot Logo"> <!-- Bot logo image -->
+                <span>Welcome to the Mental Health Chatbot! How can I assist you today?</span>
+            </div>
+        </div>
         <input id="user-input" class="chat-input" type="text" placeholder="Type your message here...">
         <button onclick="sendMessage()" class="submit-btn">Send</button>
     </div>
 
-    <script src="/static/css/js/script.js"></script>
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const chatHistory = document.getElementById('chat-history');
+
+            const userMessage = userInput.value.trim();
+
+            if (!userMessage) {
+                return;  // Exit if input is empty
+            }
+
+            // Display the user message
+            const userMessageElement = document.createElement('div');
+            userMessageElement.classList.add('chat-message', 'user-message');
+            userMessageElement.innerHTML = `<span>${userMessage}</span>
+                                            <div class="user-circle">U</div>`;
+            chatHistory.appendChild(userMessageElement);
+
+            // Clear the input field
+            userInput.value = '';
+
+            // Scroll to the bottom of the chat history
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Send the user message to the server
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botReply = data.reply;
+
+                // Display the bot's response only after user's message is sent
+                const botMessageElement = document.createElement('div');
+                botMessageElement.classList.add('chat-message', 'bot-message');
+                botMessageElement.innerHTML = `<img src="/static/css/original.jpeg" alt="Bot Logo">
+                                                <span>${botReply}</span>`;
+                chatHistory.appendChild(botMessageElement);
+
+                // Scroll to the bottom of the chat history
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
 </body>
 </html>

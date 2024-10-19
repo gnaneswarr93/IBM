@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from models.chatbot_model import get_mental_health_reply, log_conversation, get_past_conversations
+from models.work import generate_response, log_conversation, get_past_conversations
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ def index():
 @app.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message")
-    bot_reply = get_mental_health_reply(user_message)
+    bot_reply = generate_response(user_message)
     log_conversation(user_message, bot_reply)
     return jsonify({"reply": bot_reply})
 
