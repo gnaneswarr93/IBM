@@ -4,7 +4,7 @@ import os
 
 
 # Placeholder API key (replace with a valid one when available)
-API_KEY = "AIzaSyDfG5MxG15fV7KQuErL4ALG3ucbROQlVV0"
+API_KEY = "YOUR_API_KEY"
 # API URL updated (replace with the appropriate model and endpoint as per API documentation)
 API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}'
 
